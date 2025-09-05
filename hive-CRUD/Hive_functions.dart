@@ -1,5 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'Hive_box_const.dart';
+import 'hiveBoxConst.dart';
 
 class HiveFunctions {
   // Box which will use to store the things
@@ -8,11 +8,6 @@ class HiveFunctions {
   // Create or add single data in hive
   static createUser(Map data) {
     userBox.add(data);
-  }
-
-  // Create or add multiple data in hive
-  static addAllUser(List data) {
-    userBox.addAll(data);
   }
 
   // Get All data  stored in hive
@@ -25,11 +20,6 @@ class HiveFunctions {
     return data.reversed.toList();
   }
 
-  // Get data for particular user in hive
-  static Map getUser(int key) {
-    return userBox.get(key);
-  }
-
   // update data for particular user in hive
   static updateUser(int key, Map data) {
     userBox.put(key, data);
@@ -38,10 +28,5 @@ class HiveFunctions {
   // delete data for particular user in hive
   static deleteUser(int key) {
     return userBox.delete(key);
-  }
-
-  // delete data for particular user in hive
-  static deleteAllUser(int key) {
-    return userBox.deleteAll(userBox.keys);
   }
 }
