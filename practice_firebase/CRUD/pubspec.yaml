@@ -1,0 +1,4 @@
+// Copy and Paste this code inside your pubspec.yaml file
+  cloud_firestore: ^5.6.12
+  firebase_core: ^3.13.0
+  firebase_auth: ^5.5.2
