@@ -11,7 +11,7 @@ class ImageListScreen extends StatefulWidget {
 
 class _ImageListScreenState extends State<ImageListScreen> {
   final FirebaseStorage storage = FirebaseStorage.instance;
-  List<Map<String, dynamic>> images = []; // store both URL and reference name
+  List<Map<String, dynamic>> imageUrls = []; // store both URL and reference name
   bool isLoading = true;
 
   @override
@@ -33,7 +33,7 @@ class _ImageListScreenState extends State<ImageListScreen> {
       );
 
       setState(() {
-        images = fetchedImages;
+        imageUrls = fetchedImages;
       });
     } catch (e) {
       ScaffoldMessenger.of(
@@ -89,7 +89,7 @@ class _ImageListScreenState extends State<ImageListScreen> {
       appBar: AppBar(title: const Text('Display & Delete Images')),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : images.isEmpty
+          : imageUrls.isEmpty
           ? const Center(child: Text('No images found.'))
           : GridView.builder(
               padding: const EdgeInsets.all(8),
@@ -98,9 +98,9 @@ class _ImageListScreenState extends State<ImageListScreen> {
                 crossAxisSpacing: 8,
                 mainAxisSpacing: 8,
               ),
-              itemCount: images.length,
+              itemCount: imageUrls.length,
               itemBuilder: (context, index) {
-                final image = images[index];
+                final image = imageUrls[index];
                 final url = image['url'];
                 final path = image['path'];
 

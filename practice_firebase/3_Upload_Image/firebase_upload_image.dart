@@ -14,7 +14,6 @@ class _UploadScreenState extends State<UploadScreen> {
   File? _imageFile;
   String? _downloadUrl;
   bool _isUploading = false;
-
   final picker = ImagePicker();
 
   Future<void> _pickImage() async {
@@ -33,17 +32,12 @@ class _UploadScreenState extends State<UploadScreen> {
     });
 
     try {
-      // Define the path where the file will be stored
       final storageRef = FirebaseStorage.instance.ref().child(
         'uploads/${DateTime.now().millisecondsSinceEpoch}.jpg',
       );
 
-      // Upload the file
       await storageRef.putFile(_imageFile!);
-
-      // Get the file URL
       final url = await storageRef.getDownloadURL();
-
       setState(() {
         _downloadUrl = url;
       });
@@ -83,21 +77,6 @@ class _UploadScreenState extends State<UploadScreen> {
                   ? const CircularProgressIndicator(color: Colors.white)
                   : const Text('Upload to Firebase'),
             ),
-            const SizedBox(height: 20),
-            if (_downloadUrl != null)
-              Column(
-                children: [
-                  const Text(
-                    'Uploaded Image URL:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    _downloadUrl!,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.blue),
-                  ),
-                ],
-              ),
           ],
         ),
       ),
