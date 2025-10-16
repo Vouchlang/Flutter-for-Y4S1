@@ -19,11 +19,29 @@ class HomeScreen extends StatelessWidget {
     }
 
     Future<void> _logout(BuildContext context) async {
-      await FirebaseAuth.instance.signOut();
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-        (route) => false,
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Log Out'),
+          content: Text('Are you sure you want to log out?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              },
+              child: const Text('Log Out'),
+            ),
+          ],
+        ),
       );
     }
 
