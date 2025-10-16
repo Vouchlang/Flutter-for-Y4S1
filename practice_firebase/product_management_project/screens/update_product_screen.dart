@@ -19,6 +19,7 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
   final _formKey = GlobalKey<FormState>();
   final _firestore = FirestoreService();
   final _storage = StorageService();
+  bool _isLoading = false;
 
   late String _name;
   late double _price;
@@ -37,45 +38,53 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
   }
 
   Future<void> _updateProduct() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) throw Exception('User not logged in');
-    if (!_formKey.currentState!.validate()) return;
-    _formKey.currentState!.save();
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('User not logged in');
+      if (!_formKey.currentState!.validate()) return;
+      _formKey.currentState!.save();
 
-    String? imageUrl = widget.product.imageUrl;
+      setState(() => _isLoading = true);
 
-    // If a new image is chosen, upload it
-    if (_newImage != null) {
-      imageUrl = await _storage.uploadImage(
-        _newImage!,
-        'products/${DateTime.now().millisecondsSinceEpoch}.jpg',
+      String? imageUrl = widget.product.imageUrl;
+
+      // If a new image is chosen, upload it
+      if (_newImage != null) {
+        imageUrl = await _storage.uploadImage(
+          _newImage!,
+          'products/${DateTime.now().millisecondsSinceEpoch}.jpg',
+        );
+      }
+
+      final updatedProduct = Product(
+        id: widget.product.id,
+        name: _name,
+        price: _price,
+        imageUrl: imageUrl,
+        userId: user.uid,
       );
-    }
 
-    final updatedProduct = Product(
-      id: widget.product.id,
-      name: _name,
-      price: _price,
-      imageUrl: imageUrl,
-      userId: user.uid,
-    );
-
-    await _firestore.updateProduct(updatedProduct);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Product updated successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      Navigator.pop(context); // Go back to HomeScreen
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to update product'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      await _firestore.updateProduct(updatedProduct);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Product updated successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context); // Go back to HomeScreen
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update product'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -109,10 +118,12 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
                 label: const Text('Pick New Image (optional)'),
               ),
               const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: _updateProduct,
-                child: const Text('Update Product'),
-              ),
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ElevatedButton(
+                      onPressed: _updateProduct,
+                      child: const Text('Update Product'),
+                    ),
             ],
           ),
         ),
